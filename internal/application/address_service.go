@@ -2,18 +2,21 @@ package application
 
 import (
 	"github.com/samuel-go-expert/weather-api/internal/domain"
-	"github.com/samuel-go-expert/weather-api/internal/infrastructure"
 )
+
+type AddressApi interface {
+	GetAddress(cep string) (domain.Address, error)
+}
 
 type AddressServiceInterface interface {
 	GetAddressByZipCode(zipCode string) (domain.Address, error)
 }
 
 type AddressService struct {
-	addressApi infrastructure.AddressApi
+	addressApi AddressApi
 }
 
-func NewAddressService(addressApi infrastructure.AddressApi) *AddressService {
+func NewAddressService(addressApi AddressApi) *AddressService {
 	return &AddressService{
 		addressApi: addressApi,
 	}

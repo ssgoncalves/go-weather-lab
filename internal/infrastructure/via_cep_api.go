@@ -3,12 +3,9 @@ package infrastructure
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/samuel-go-expert/weather-api/internal/application"
 	"github.com/samuel-go-expert/weather-api/internal/domain"
 )
-
-type AddressApi interface {
-	GetAddress(cep string) (domain.Address, error)
-}
 
 type LocationResponse struct {
 	City  string `json:"localidade"`
@@ -20,7 +17,7 @@ type CepApiClient struct {
 	httpClient HttpClientInterface
 }
 
-func NewCepApi(h HttpClientInterface) AddressApi {
+func NewViaCepApi(h HttpClientInterface) application.AddressApi {
 	return &CepApiClient{
 		httpClient: h,
 	}

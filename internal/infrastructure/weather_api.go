@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/samuel-go-expert/weather-api/internal/application"
 	"github.com/samuel-go-expert/weather-api/internal/domain"
 	"log"
 	"net/http"
@@ -30,11 +31,7 @@ type WeatherAPIClient struct {
 	env        EnvInterface
 }
 
-type WeatherApi interface {
-	GetWeather(city string) (domain.Weather, error)
-}
-
-func NewWeatherAPI(h HttpClientInterface, e EnvInterface) WeatherApi {
+func NewWeatherAPI(h HttpClientInterface, e EnvInterface) application.WeatherApi {
 	return &WeatherAPIClient{
 		httpClient: h,
 		env:        e,

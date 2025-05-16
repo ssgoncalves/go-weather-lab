@@ -1,7 +1,6 @@
 services:
-  app:
+  weather:
     image: golang:1.24
-    container_name: weather-api-go
     ports:
       - "8080:8080"
     volumes:
@@ -15,3 +14,27 @@ services:
       - GOOS=linux
       - GOARCH=amd64
     restart: unless-stopped
+    networks:
+      - default
+
+  zipcode:
+    image: golang:1.24
+    ports:
+      - "8081:8080"
+    volumes:
+      - .:/app
+    working_dir: /app
+    env_file:
+      - .env
+    command: go run cmd/main.go
+    environment:
+      - CGO_ENABLED=0
+      - GOOS=linux
+      - GOARCH=amd64
+    restart: unless-stopped
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge

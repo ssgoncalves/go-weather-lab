@@ -15,7 +15,8 @@ func main() {
 	loadEnvs()
 
 	router := gin.Default()
-	router.GET("/zip-code/:zipCode/weather", getController().GetWeatherByZipCode)
+	router.GET("/zip-code/:zipCode/weather", getWeatherController().GetWeatherByZipCode)
+	router.GET("/zip-code/:zipCode", getZipCodeController().GetZipCodeInfo)
 
 	err := router.Run(":8080")
 
@@ -25,18 +26,28 @@ func main() {
 	}
 }
 
-func getController() (WeatherController *api.WeatherController) {
+func getZipCodeController() (ZipCodeController *api.ZipCodeController) {
+
+	httpClient := infrastructure.NewHttpClient()
+
+	addressApi := infrastructure.NewViaCepApi(httpClient)
+	addressService := application.NewAddressService(addressApi)
+
+	return api.NewZipCodeController(addressService)
+
+}
+
+func getWeatherController() (WeatherController *api.WeatherController) {
 
 	httpClient := infrastructure.NewHttpClient()
 	env := infrastructure.NewEnv()
 
+	zipCodeApi := infrastructure.NewZipApi(httpClient)
+	zipCodeService := application.NewZipCodeService(zipCodeApi)
+
 	weatherApi := infrastructure.NewWeatherAPI(httpClient, env)
-	weatherService := application.NewWeatherService(weatherApi)
-
-	addressApi := infrastructure.NewCepApi(httpClient)
-	addressService := application.NewAddressService(addressApi)
-
-	return api.NewWeatherController(weatherService, addressService)
+	weatherService := application.NewWeatherService(weatherApi, zipCodeService)
+	return api.NewWeatherController(weatherService)
 }
 
 func loadEnvs() bool {

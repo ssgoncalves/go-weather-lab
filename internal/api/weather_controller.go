@@ -8,47 +8,30 @@ import (
 
 type WeatherController struct {
 	weatherService application.WeatherServiceInterface
-	addressService application.AddressServiceInterface
 }
 
-func NewWeatherController(ws application.WeatherServiceInterface, as application.AddressServiceInterface) *WeatherController {
+func NewWeatherController(ws application.WeatherServiceInterface) *WeatherController {
 	return &WeatherController{
 		weatherService: ws,
-		addressService: as,
 	}
 }
 
 func (controller *WeatherController) GetWeatherByZipCode(c *gin.Context) {
-	zipCode := c.Param("zipCode")
 
-	if (domain.IsValidZipCode(zipCode)) == false {
-		c.String(422, "invalid zipcode")
+	weather, errWeather := controller.weatherService.GetWeatherByCity(c.Param("zipCode"))
+
+	if errWeather == nil {
+		c.JSON(200, weather)
 		return
 	}
 
-	address, errAddress := controller.addressService.GetAddressByZipCode(zipCode)
-
-	if errAddress != nil {
-
-		switch e := errAddress.(type) {
-		case *domain.InvalidZipCodeError:
-			c.String(422, e.Error())
-		case *domain.AddressNotFoundError:
-			c.String(404, e.Error())
-		default:
-
-			c.String(500, e.Error())
-		}
-
-		return
+	switch e := errWeather.(type) {
+	case *domain.InvalidZipCodeError:
+		c.String(422, e.Error())
+	case *domain.AddressNotFoundError:
+		c.String(404, e.Error())
+	default:
+		c.String(500, e.Error())
 	}
 
-	weather, errWeather := controller.weatherService.GetWeatherByCity(address.City)
-
-	if errWeather != nil {
-		c.String(502, errWeather.Error())
-		return
-	}
-
-	c.JSON(200, weather)
 }
