@@ -1,8 +1,10 @@
 package infrastructure
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/samuel-go-expert/weather-api/internal/application"
 	"github.com/samuel-go-expert/weather-api/internal/domain"
 	"log"
 	"net/http"
@@ -30,18 +32,14 @@ type WeatherAPIClient struct {
 	env        EnvInterface
 }
 
-type WeatherApi interface {
-	GetWeather(city string) (domain.Weather, error)
-}
-
-func NewWeatherAPI(h HttpClientInterface, e EnvInterface) WeatherApi {
+func NewWeatherAPI(h HttpClientInterface, e EnvInterface) application.WeatherApi {
 	return &WeatherAPIClient{
 		httpClient: h,
 		env:        e,
 	}
 }
 
-func (c *WeatherAPIClient) GetWeather(city string) (domain.Weather, error) {
+func (c *WeatherAPIClient) GetWeather(city string, ctx context.Context) (domain.Weather, error) {
 
 	apiKey := c.env.Getenv(weatherApiKeyName)
 
@@ -49,7 +47,7 @@ func (c *WeatherAPIClient) GetWeather(city string) (domain.Weather, error) {
 		return domain.Weather{}, fmt.Errorf("API key not found")
 	}
 
-	response, err := c.httpClient.MakeGet(buildWeatherApiUrl(apiKey, city))
+	response, err := c.httpClient.MakeGet(buildWeatherApiUrl(apiKey, city), ctx)
 
 	if err != nil {
 		return domain.Weather{}, fmt.Errorf("failed to fetch weather data for location %s: %v", city, err)

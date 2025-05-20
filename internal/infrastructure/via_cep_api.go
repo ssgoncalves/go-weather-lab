@@ -1,14 +1,12 @@
 package infrastructure
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/samuel-go-expert/weather-api/internal/application"
 	"github.com/samuel-go-expert/weather-api/internal/domain"
 )
-
-type AddressApi interface {
-	GetAddress(cep string) (domain.Address, error)
-}
 
 type LocationResponse struct {
 	City  string `json:"localidade"`
@@ -20,16 +18,16 @@ type CepApiClient struct {
 	httpClient HttpClientInterface
 }
 
-func NewCepApi(h HttpClientInterface) AddressApi {
+func NewViaCepApi(h HttpClientInterface) application.AddressApi {
 	return &CepApiClient{
 		httpClient: h,
 	}
 }
 
-func (c *CepApiClient) GetAddress(zipCode string) (domain.Address, error) {
+func (c *CepApiClient) GetAddress(zipCode string, ctx context.Context) (domain.Address, error) {
 	url := fmt.Sprintf("https://viacep.com.br/ws/%s/json/", zipCode)
 
-	response, err := c.httpClient.MakeGet(url)
+	response, err := c.httpClient.MakeGet(url, ctx)
 
 	if err != nil {
 		return domain.Address{}, err

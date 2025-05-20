@@ -1,7 +1,6 @@
 # Weather API - Projeto de Estudo em Go
 Este repositório contém um projeto de estudo que utiliza Go para consultar dados de clima baseados em um CEP. O projeto utiliza o Docker para containerizar a aplicação e Docker Compose para facilitar a execução dos serviços.
 
-Link para ambiente via Google Cloud RUN: https://go-weather-lab-928052383442.europe-west1.run.app/zip-code/01333030/weather
 
 ## Como Rodar o Projeto
 1. Clonar o Repositório
@@ -30,12 +29,6 @@ docker-compose up
 
 O serviço estará disponível em http://localhost:8080/zip-code/SEU-CEP-AQUI/weather (ou a porta definida no docker-compose.yml).
 
-5. Rodar os Testes
-   O repositório também contém testes automatizados para garantir o funcionamento correto da aplicação. Para rodar os testes, você pode utilizar o seguinte comando:
-
-```bash
-docker-compose run --rm app go test ./internal/tests/...
-```
 
 Este comando irá rodar os testes dentro do contêiner, garantindo que todos os serviços e funcionalidades estão funcionando corretamente.
 
