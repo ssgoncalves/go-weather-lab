@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"context"
 	"fmt"
 	"github.com/goccy/go-json"
 	"github.com/samuel-go-expert/weather-api/internal/domain"
@@ -16,12 +17,12 @@ func NewZipApi(httpClient HttpClientInterface) *ZipCodeApi {
 	}
 }
 
-func (s *ZipCodeApi) GetZipCodeInfo(zipCode string) (domain.Address, error) {
+func (s *ZipCodeApi) GetZipCodeInfo(zipCode string, c context.Context) (domain.Address, error) {
 	if !domain.IsValidZipCode(zipCode) {
 		return domain.Address{}, &domain.InvalidZipCodeError{ZipCode: zipCode}
 	}
 
-	addressResponse, err := s.httpClient.MakeGet("http://host.docker.internal:8081/zip-code/" + zipCode)
+	addressResponse, err := s.httpClient.MakeGet("http://host.docker.internal:8081/zip-code/"+zipCode, c)
 
 	if err != nil {
 		return domain.Address{}, err

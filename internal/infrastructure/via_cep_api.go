@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/samuel-go-expert/weather-api/internal/application"
@@ -23,10 +24,10 @@ func NewViaCepApi(h HttpClientInterface) application.AddressApi {
 	}
 }
 
-func (c *CepApiClient) GetAddress(zipCode string) (domain.Address, error) {
+func (c *CepApiClient) GetAddress(zipCode string, ctx context.Context) (domain.Address, error) {
 	url := fmt.Sprintf("https://viacep.com.br/ws/%s/json/", zipCode)
 
-	response, err := c.httpClient.MakeGet(url)
+	response, err := c.httpClient.MakeGet(url, ctx)
 
 	if err != nil {
 		return domain.Address{}, err

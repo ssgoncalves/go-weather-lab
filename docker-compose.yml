@@ -13,6 +13,7 @@ services:
       - CGO_ENABLED=0
       - GOOS=linux
       - GOARCH=amd64
+      - TITLE ="Weather Service"
     restart: unless-stopped
     networks:
       - default
@@ -31,9 +32,42 @@ services:
       - CGO_ENABLED=0
       - GOOS=linux
       - GOARCH=amd64
+      - CGO_ENABLED=0
+      - GOOS=linux
+      - GOARCH=amd64
+      - TITLE="Zipcode Service"
     restart: unless-stopped
+    depends_on:
+      - otel-collector
+      - zipkin
     networks:
       - default
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    environment:
+      - ZIPKIN_HTTP_PORT=9411
+    restart: always
+    networks:
+      - default
+
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    container_name: otel-collector
+    ports:
+      - "4317:4317"  # Porta OTLP (gRPC)
+      - "4318:4318"  # Porta OTLP (gRPC)
+      - "55681:55681"  # Porta para o formato OTLP (HTTP)
+    volumes:
+      - ./.docker/otel-collector-config.yaml:/etc/otel-collector-config.yaml  # Configuração do OpenTelemetry Collector
+    command: [ "--config", "/etc/otel-collector-config.yaml" ]
+    restart: always
+    networks:
+      - default
+
 
 networks:
   default:

@@ -1,15 +1,16 @@
 package application
 
 import (
+	"context"
 	"github.com/samuel-go-expert/weather-api/internal/domain"
 )
 
 type WeatherApi interface {
-	GetWeather(city string) (domain.Weather, error)
+	GetWeather(city string, c context.Context) (domain.Weather, error)
 }
 
 type WeatherServiceInterface interface {
-	GetWeatherByCity(city string) (domain.Weather, error)
+	GetWeatherByCity(city string, c context.Context) (domain.Weather, error)
 }
 
 type WeatherService struct {
@@ -24,15 +25,15 @@ func NewWeatherService(weatherApi WeatherApi, zipCodeService ZipCodeServiceInter
 	}
 }
 
-func (s *WeatherService) GetWeatherByCity(zipCode string) (domain.Weather, error) {
+func (s *WeatherService) GetWeatherByCity(zipCode string, c context.Context) (domain.Weather, error) {
 
-	address, zipCodeErro := s.zipCodeService.GetAddressByZipCode(zipCode)
+	address, zipCodeErro := s.zipCodeService.GetAddressByZipCode(zipCode, c)
 
 	if zipCodeErro != nil {
 		return domain.Weather{}, zipCodeErro
 	}
 
-	weather, err := s.weatherApi.GetWeather(address.City)
+	weather, err := s.weatherApi.GetWeather(address.City, c)
 
 	if err != nil {
 		return domain.Weather{}, err
